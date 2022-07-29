@@ -1,9 +1,12 @@
 class DrawingBoard {
     MODE = "NONE";
     IsMouseDown = false;
+    eraserColor = "#ffffff";
+    backgroundColor = "#ffffff";
     constructor(){
         this.assignElement();
         this.initContext();
+        this.initCanvasBackgroundColor();
         this.addEvent();
     }
     assignElement() {
@@ -15,9 +18,14 @@ class DrawingBoard {
         this.brushPanelEl = this.containerEl.querySelector("#brushPanel");
         this.brushSliderEl = this.brushPanelEl.querySelector("#brushSize");
         this.brushSizePreviewEl = this.brushPanelEl.querySelector("#brushSizePreview");
+        this.eraserEl = this.toolbarEl.querySelector("#eraser");
     }
     initContext() {
         this.context = this.canvasEl.getContext("2d");
+    }
+    initCanvasBackgroundColor() {
+        this.context.fillStyle = this.backgroundColor;
+        this.context.fillRect(0, 0, this.canvasEl.width, this.canvasEl.height);
     }
     addEvent() {
         this.brushEl.addEventListener("click", this.onClickBrush.bind(this));
@@ -27,6 +35,15 @@ class DrawingBoard {
         this.canvasEl.addEventListener("mouseout", this.onMouseOut.bind(this));
         this.brushSliderEl.addEventListener("input", this.onChangeBrushSize.bind(this));
         this.colorPickerEl.addEventListener("input", this.onChangeColor.bind(this));
+        this.eraserEl.addEventListener("click", this.onClickEraser.bind(this));
+    }
+    onClickEraser(event) {
+        const IsActive = event.currentTarget.classList.contains("active");
+        this.MODE = IsActive ? "NONE" : "ERASER";
+        this.canvasEl.style.cursor = IsActive ? "default" : "crosshair";
+        this.brushEl.classList.remove("active");
+        this.brushPanelEl.classList.add("hide");
+        this.eraserEl.classList.toggle("active");
     }
     onChangeColor(event) {
         this.brushSizePreviewEl.style.background = event.target.value;
@@ -42,8 +59,13 @@ class DrawingBoard {
         this.context.beginPath();
         this.context.moveTo(currentPosition.x, currentPosition.y);
         this.context.lineCap = "round";
-        this.context.strokeStyle = this.colorPickerEl.value;
-        this.context.lineWidth = this.brushSliderEl.value;
+        if (this.MODE === "BRUSH") {
+            this.context.strokeStyle = this.colorPickerEl.value;
+            this.context.lineWidth = this.brushSliderEl.value;
+        } else if (this.MODE === "ERASER") {
+            this.context.strokeStyle = this.eraserColor;
+            this.context.lineWidth = 50;
+        }
     // this.context.lineTo(400, 400);
     // this.context.stroke();
     }
