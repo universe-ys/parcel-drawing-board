@@ -1,5 +1,6 @@
 # parcel-drawing-board
 
+## 개발환경설정
 
 `npm init -y`
 
@@ -119,7 +120,7 @@ $fa-font-path: "../../node_modules/@fortawesome/fontawesome-free/webfonts";
 @import "../../node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
 ```
 
-그림판 선그리기 기능
+## 선그리기 기능
 
 ```jsx
 // canvas 2d로 구현
