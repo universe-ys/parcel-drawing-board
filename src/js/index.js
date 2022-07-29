@@ -3,6 +3,8 @@ class DrawingBoard {
   IsMouseDown = false; // true false
   eraserColor = "#ffffff";
   backgroundColor = "#ffffff";
+  IsNavigatorVisible = false;
+  undoArray = [];
 
   constructor() {
     this.assignElement();
@@ -26,6 +28,7 @@ class DrawingBoard {
     this.navigatorImageContainerEl = this.containerEl.querySelector("#imgNav");
     this.navigatorImageEl =
       this.navigatorImageContainerEl.querySelector("#canvasImg");
+    this.undoEl = this.toolbarEl.querySelector("#undo");
   }
 
   initContext() {
@@ -53,15 +56,52 @@ class DrawingBoard {
       "click",
       this.onClickNavigator.bind(this)
     );
+    this.undoEl.addEventListener("click", this.onClickUndo.bind(this));
+  }
+
+  onClickUndo() {
+    if (this.undoArray.length === 0) {
+      alert("더 이상 실행취소 불가합니다!");
+      return;
+    }
+    let prevDataUrl = this.undoArray.pop();
+    let prevImg = new Image();
+    prevImg.onload = () => {
+      this.context.clearRect(0, 0, this.canvasEl.width, this.canvasEl.height);
+      this.context.drawImage(
+        prevImg,
+        0,
+        0,
+        this.canvasEl.width,
+        this.canvasEl.height,
+        0,
+        0,
+        this.canvasEl.width,
+        this.canvasEl.height
+      );
+    };
+    prevImg.src = prevDataUrl;
+  }
+
+  saveState() {
+    if (this.undoArray.length > 4) {
+      this.undoArray.shift();
+      this.undoArray.push(this.canvasEl.toDataURL());
+    } else {
+      this.undoArray.push(this.canvasEl.toDataURL());
+    }
+    this.undoArray.push(this.canvasEl.toDataURL());
   }
 
   onClickNavigator(event) {
+    this.IsNavigatorVisible = !event.currentTarget.classList.contains("active");
     event.currentTarget.classList.toggle("active");
     this.navigatorImageContainerEl.classList.toggle("hide");
     this.updateNavigator();
   }
 
   updateNavigator() {
+    if (!this.IsNavigatorVisible) return;
     this.navigatorImageEl.src = this.canvasEl.toDataURL();
   }
 
@@ -97,6 +137,7 @@ class DrawingBoard {
       this.context.strokeStyle = this.eraserColor;
       this.context.lineWidth = 50;
     }
+    this.saveState();
   }
 
   onMouseUp() {
