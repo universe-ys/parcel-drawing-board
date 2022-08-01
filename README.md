@@ -175,3 +175,44 @@ onMouseDown(event) {
 `lineTo()` 움직일 좌표
 
 `stroke()` 그리는 명령
+
+
+##캔버스 이미지를 url 로 가져와서 미니맵에 보여주기
+
+```jsx
+onClickNavigator(event) {
+	this.IsNavigatorVisible = !event.currentTarget.classList.contains("active");
+  event.currentTarget.classList.toggle("active");
+  this.navigatorImageContainerEl.classList.toggle("hide");
+  this.updateNavigator();
+}
+
+updateNavigator() {
+	if (!this.IsNavigatorVisible) return;
+  this.navigatorImageEl.src = this.canvasEl.toDataURL();
+}
+```
+
+**onMouseUp, onMouseOut 일 때 마다 미니맵 이미지 업데이트**
+
+onMouseUP, onMouseOut 에서 `this.updateNavigator()` 추가!
+
+미니맵이 보이지 않을 때는 업데이트 하지 않음
+
+`if (!this.IsNavigatorVisible) return;`
+
+## 실행취소기능
+
+실행취소기능을 배열로 만들어 `toDataURL()` 로 데이터를 가져와 업데이트 될 때 마다 이미지를 저장한다
+
+## 초기화 기능
+
+## 이미지 다운로드 기능
+
+```jsx
+onClickDownload() {
+    this.downloadLinkEl.href = this.canvasEl.toDataURL("image/jpeg", 1); // 파일형식, 압축율(1은 원본) 
+    this.downloadLinkEl.download = "example.jpeg"; // 저장될 파일명
+  }
+```
+
